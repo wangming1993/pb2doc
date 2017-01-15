@@ -17,7 +17,7 @@ func init() {
 	fmt.Println("init...")
 	MessageCompiler, _ = regexp.Compile("^\\s?message ")
 	ServiceCompiler, _ = regexp.Compile("^\\s?service ")
-	SingleCommentCompiler, _ = regexp.Compile("^\\s+(//.*)|(/\\*.*\\*/)")
+	SingleCommentCompiler, _ = regexp.Compile("^\\s*(//.*)|(/\\*.*\\*/)")
 	MultiCommentStartCompiler, _ = regexp.Compile("^\\s?/\\*.*")
 	MultiCommentEndCompiler, _ = regexp.Compile("^\\s?.*\\*/")
 }
