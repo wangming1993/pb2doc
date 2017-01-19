@@ -2,15 +2,18 @@ package pb
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/spf13/cast"
+	"log"
 )
 
 type Message struct {
-	Fields  []*Field
-	Comment string
-	Package string
-	Name    string
+	Comment  string
+	Package  string
+	Name     string
+	Messages []*Message
+	Enums    []*Enum
+	Oneofs   []*Oneof
+	Fields   []*Field
 }
 
 func (m *Message) String() string {
@@ -18,14 +21,39 @@ func (m *Message) String() string {
 }
 
 func (m *Message) Data() {
-	fmt.Println("--------------------------------------")
-	fmt.Println("Name is:\n", m.Name)
-	fmt.Println("Comments is:\n", m.Comment)
-	fmt.Println("Fields count:\n", len(m.Fields))
-	for _, f := range m.Fields {
-		f.String()
+	log.Println("-----------------------------------------")
+	log.Println("Name:", m.Name)
+	if len(m.Messages) > 0 {
+		log.Println("--> Messages:")
+		for _, message := range m.Messages {
+			log.Println("------> ", message.Name)
+		}
 	}
-	fmt.Println("--------------------------------------")
+	if len(m.Enums) > 0 {
+		log.Println("--> Enums:")
+		for _, e := range m.Enums {
+			log.Println("------> ", e.Name)
+		}
+	}
+	if len(m.Oneofs) > 0 {
+		log.Println("--> Oneofs:")
+		for _, e := range m.Oneofs {
+			log.Println("------> ", e.Name)
+			if len(e.Fields) > 0 {
+				log.Println("----------> Fields:")
+				for _, f := range e.Fields {
+					log.Println("------------> ", f.String())
+				}
+			}
+		}
+	}
+	if len(m.Fields) > 0 {
+		log.Println("--> Fields:")
+		for _, f := range m.Fields {
+			log.Println("-----> ", f.String())
+		}
+	}
+	log.Println("-----------------------------------------")
 }
 
 func (m *Message) JSON() (string, error) {

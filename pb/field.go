@@ -44,6 +44,6 @@ func NewFieldWithComment(line, comment string) *Field {
 	return field
 }
 
-func (f *Field) String() {
-	fmt.Printf("Field:%s, type:%s, order:%d, comment:%s \n", f.Name, f.Type, f.Order, f.Comment)
+func (f *Field) String() string {
+	return fmt.Sprintf("Field:%s, type:%s, order:%d, comment:%s", f.Name, f.Type, f.Order, f.Comment)
 }

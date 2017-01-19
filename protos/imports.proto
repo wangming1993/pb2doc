@@ -1,0 +1,11 @@
+syntax = "proto3";
+package pb;
+
+import "imports_a.proto";
+
+// Message man
+message Man {
+  string name = 1;
+  repeated string loves = 2;
+}
+

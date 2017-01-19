@@ -1,13 +1,27 @@
 syntax = "proto3";
 package pb;
-/** Person Message */
+
+// The request message containing the user's name.
+message Request {
+  string url = 1;
+
+  oneof method {
+    string get = 1;
+    string put = 2;
+    string post = 3;
+    string delete = 4;
+    string header = 5;
+    string options = 6;
+  }
+}
+
 /**
  * This is multi comments
  * Please parse it use head
  */
 message Person {
   // The name of person
-  repeated string name = 1;
+  string name = 1;
   int32 id = 2;  // Unique ID number for this person.
   string email = 3;
   enum PhoneType {
@@ -16,13 +30,19 @@ message Person {
     work = 2;
   }
   PhoneType type = 4;
+
+  repeated Property properties = 5;
 }
-// The request message containing the user's name.
-message Request {
-  string name = 1;
+
+message Property {
+  int32 age = 1;
+  string gender = 2;
+  repeated string loves = 3;
 }
+
 // The greeting service definition.
 service Member {
   // Sends a greeting
   rpc PersonList (Request) returns (Person) {}
+  rpc SendRequest (Request) returns (Person) {}
 }
