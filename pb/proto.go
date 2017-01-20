@@ -117,7 +117,7 @@ func (p *Proto) Parse() {
 			}
 			skip := ParseMessage(p.content[i:], 1, message)
 			//log.Println(i, skip, i+skip, message.Name)
-			message.Data()
+			//message.Data()
 			i += skip
 		}
 	}

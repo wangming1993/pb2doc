@@ -3,6 +3,7 @@ package pb
 import (
 	"fmt"
 	"github.com/spf13/cast"
+	"github.com/wangming1993/pb2doc/parser"
 	"regexp"
 )
 
@@ -28,7 +29,7 @@ func NewField(line string) *Field {
 		Order:    cast.ToInt(matches[4]),
 	}
 	if len(matches) > 5 {
-		field.Comment = matches[5]
+		field.Comment = parser.PrettifyNote(matches[5])
 	}
 	return field
 }
@@ -39,7 +40,10 @@ func NewFieldWithComment(line, comment string) *Field {
 		return nil
 	}
 	if comment != "" {
-		field.Comment = comment
+		fmt.Println(comment)
+		fmt.Println(parser.PrettifyNote(comment))
+
+		field.Comment = parser.PrettifyNote(comment)
 	}
 	return field
 }

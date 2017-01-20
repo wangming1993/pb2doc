@@ -2,8 +2,9 @@ package pb
 
 import (
 	"encoding/json"
-	"github.com/spf13/cast"
 	"log"
+
+	"github.com/spf13/cast"
 )
 
 type Message struct {
@@ -20,7 +21,9 @@ func (m *Message) String() string {
 	return cast.ToString(len(m.Fields))
 }
 
+// Data show the info
 func (m *Message) Data() {
+	m.WriteHtml()
 	log.Println("-----------------------------------------")
 	log.Println("Name:", m.Name)
 	if len(m.Messages) > 0 {
@@ -56,6 +59,7 @@ func (m *Message) Data() {
 	log.Println("-----------------------------------------")
 }
 
+// JSON use json MarshalIndent to format
 func (m *Message) JSON() (string, error) {
 	buf, err := json.MarshalIndent(m, "", "\t")
 	if err != nil {

@@ -1,6 +1,9 @@
 package parser
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 var (
 	SingleCommentCompiler     *regexp.Regexp
@@ -84,4 +87,27 @@ func IsExtendType(line string) bool {
 		StartWithMessage(line) ||
 		StartWithOneof(line) ||
 		StartWithService(line)
+}
+
+func RemoveNoteSymbol(note string) string {
+	note = strings.TrimPrefix(note, " ")
+	note = strings.TrimPrefix(note, "/**")
+	note = strings.TrimPrefix(note, "/*")
+	note = strings.TrimPrefix(note, "//")
+	note = strings.TrimPrefix(note, "**/")
+	note = strings.TrimPrefix(note, "*/")
+	note = strings.TrimPrefix(note, "*")
+	return note
+}
+
+func PrettifyNote(note string) string {
+	notes := strings.Split(note, "\n")
+	var comment string
+	for _, n := range notes {
+		if RemoveNoteSymbol(n) == "" {
+			continue
+		}
+		comment += RemoveNoteSymbol(n) + "<br/>"
+	}
+	return comment
 }
