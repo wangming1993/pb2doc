@@ -15,3 +15,19 @@ const (
 	BOOL   ScalarType = "bool"
 	STRING ScalarType = "string"
 )
+
+var scalarTypes map[string]ScalarType = map[string]ScalarType{
+	"double": DOUBLE,
+	"float":  FLOAT,
+	"int32":  INT32,
+	"int64":  INT64,
+	"bool":   BOOL,
+	"string": STRING,
+}
+
+func IsScalarType(name string) bool {
+	if _, ok := scalarTypes[name]; ok {
+		return true
+	}
+	return false
+}

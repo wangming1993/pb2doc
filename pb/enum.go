@@ -1,6 +1,6 @@
 package pb
 
 type Enum struct {
-	Comment string
+	Note string
 	Name    string
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"path/filepath"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/wangming1993/pb2doc/parser"
 	"github.com/wangming1993/pb2doc/pb"
@@ -8,9 +10,11 @@ import (
 
 func main() {
 	logrus.Println("init project...")
-	var protobuf = "test.proto"
+	protobuf := "member/service.proto"
 
-	parser.SetBasePath("./protos/")
+	parser.SetBasePath("./protos/proto/")
+	parser.SetPrefix("mairpc")
+
 	proto := &pb.Proto{}
-	proto.Initialize(parser.ProtoPath + protobuf)
+	proto.Initialize(filepath.Join(parser.GetBasePath(), protobuf))
 }

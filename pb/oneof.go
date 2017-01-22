@@ -5,6 +5,7 @@ import (
 )
 
 type Oneof struct {
+	pkg     string
 	Name    string
 	Comment string
 	Fields  []*Field
@@ -29,7 +30,7 @@ func ParseOneof(lines []string, oneof *Oneof) int {
 			line = lines[i]
 		}
 
-		field := NewFieldWithComment(line, comment)
+		field := NewFieldWithNote(oneof.pkg, line, comment)
 		if field != nil {
 			oneof.Fields = append(oneof.Fields, field)
 		}

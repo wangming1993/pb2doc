@@ -21,7 +21,6 @@ type Proto struct {
 }
 
 func (p *Proto) Initialize(file string) error {
-	fmt.Println("initialize...")
 	lines := parser.ReadFile(file)
 	p.content = lines
 	supported := p.IsSupported()
@@ -33,7 +32,12 @@ func (p *Proto) Initialize(file string) error {
 
 	p.initPackage()
 	p.initImports()
-	//p.ResolveImports()
+
+	fmt.Println(p.Imports, file)
+
+	RegisterProto(p.Package, parser.FileName(file))
+
+	p.ResolveImports()
 	p.Parse()
 
 	//fmt.Println(p.JSON())
@@ -81,7 +85,6 @@ func (p *Proto) initImports() {
 			p.Start += 1
 			continue
 		}
-		break
 	}
 }
 
@@ -117,8 +120,16 @@ func (p *Proto) Parse() {
 			}
 			skip := ParseMessage(p.content[i:], 1, message)
 			//log.Println(i, skip, i+skip, message.Name)
+			message.WriteHtml()
 			//message.Data()
 			i += skip
+		} else if parser.StartWithService(line) {
+			service := &Service{
+				Name:parser.GetServiceName(line),
+			}
+			skip := service.Parse(p.content[i:], 1)
+			i += skip
+			service.WriteHtml()
 		}
 	}
 }
@@ -138,12 +149,12 @@ func (p *Proto) ResolveImports() {
 }
 
 func (p *Proto) ResolveImport(importFile string) {
-	protoFile := parser.ProtoPath + importFile
-	if exists, ok := ParsingProto[protoFile]; ok && exists {
+	protoFile := GetAbsPath(p.Package, importFile)
+	if IsProtoParsed(p.Package, importFile) {
 		return
 	}
-	ParsingProto[protoFile] = true
-	fmt.Println(protoFile)
+	RegisterProto(p.Package, importFile)
+
 	newProto := &Proto{}
 	newProto.Initialize(protoFile)
 }
@@ -158,10 +169,7 @@ func ParseMessage(lines []string, depth int, message *Message) int {
 			break
 		}
 		line := lines[i]
-		if parser.StartWithMessage(line) {
-			i++
-			line = lines[i]
-		}
+
 		if parser.EndWithBrace(line) {
 			//log.Println(line)
 			depth--
@@ -175,6 +183,7 @@ func ParseMessage(lines []string, depth int, message *Message) int {
 			i += fs
 			line = lines[i]
 		}
+		i++
 
 		if parser.IsExtendType(line) {
 			depth++
@@ -183,16 +192,16 @@ func ParseMessage(lines []string, depth int, message *Message) int {
 				embedMessage := &Message{
 					Name:    parser.GetMessageName(line),
 					Comment: comment,
+					Package: message.Package,
 				}
 				i += ParseMessage(lines[i:], 1, embedMessage)
 				message.Messages = append(message.Messages, embedMessage)
 			} else if parser.StartWithEnum(line) {
 				embedEnum := &Enum{
 					Name:    parser.GetEnumName(line),
-					Comment: comment,
+					Note: comment,
 				}
 				message.Enums = append(message.Enums, embedEnum)
-				i++
 			} else if parser.StartWithOneof(line) {
 				embedOneof := &Oneof{
 					Name:    parser.GetOneofName(line),
@@ -202,15 +211,12 @@ func ParseMessage(lines []string, depth int, message *Message) int {
 
 				step := ParseOneof(lines[i:], embedOneof)
 				i += step
-			} else {
-				i++
 			}
 		} else {
-			field := NewFieldWithComment(line, comment)
+			field := NewFieldWithNote(message.Package, line, comment)
 			if field != nil {
 				message.Fields = append(message.Fields, field)
 			}
-			i++
 		}
 
 	}

@@ -59,6 +59,15 @@ func GetMessageName(line string) string {
 	return ""
 }
 
+func GetServiceName(line string) string {
+	c, _ := regexp.Compile("^\\s*service (.*)\\s{")
+	matches := c.FindStringSubmatch(line)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
+}
+
 func GetEnumName(line string) string {
 	c, _ := regexp.Compile("^\\s*enum\\s+(.*)\\s{")
 	matches := c.FindStringSubmatch(line)

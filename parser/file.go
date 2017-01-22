@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 )
 
 func ReadFile(filePath string) []string {
@@ -26,4 +27,25 @@ func ReadFile(filePath string) []string {
 	}
 
 	return lines
+}
+
+func Exists(fileName string) bool {
+	_, err := os.Stat(fileName)
+	return err == nil || os.IsExist(err)
+}
+
+func Mkdir(path string) bool {
+	err := os.MkdirAll(path, os.ModePerm)
+	return err == nil
+}
+
+func CreateFile(path, name string) (*os.File, error) {
+	if !Exists(path) {
+		Mkdir(path)
+	}
+	return os.Create(path + "/" + name)
+}
+
+func FileName(name string) string {
+	return path.Base(name)
 }
