@@ -10,6 +10,7 @@ import (
 
 var messageTemplate string = "templates/message.mustache"
 var serviceTemplate string = "templates/service.mustache"
+var messageServiceTemplate string = "templates/message_service.mustache"
 
 func (m *Message) WriteHtml() error {
 	err := m.html()
@@ -42,25 +43,69 @@ func (m *Message) html() error {
 	return err
 }
 
-func (s *Service) WriteHtml() error {
-	/*for _, rpc := range s.RPCs {
-		//f.WithLink("")
-	}*/
-	out, _ := mustache.RenderFile(serviceTemplate,
+func (m *Message) WriteHtmlWithNavigator(navigators []*Navigator) error {
+	return m.htmlWithNavigator(navigators)
+}
+
+func (m *Message) htmlWithNavigator(navigators []*Navigator) error {
+	for _, f := range m.Fields {
+		f.WithLink("")
+	}
+
+	out, _ := mustache.RenderFile(messageServiceTemplate,
 		map[string]interface{}{
-			"Name": "Service",
-			"Note": parser.PrettifyNote(s.Comment),
-			"RPCs": s.RPCs,
+			"Name":       m.Name,
+			"Comment":    parser.PrettifyNote(m.Comment),
+			"Fields":     m.Fields,
+			"Navigators": navigators,
 		},
 	)
 
-	pkgs := append([]string{"htmls"}, strings.Split(s.Package, ".")...)
+	pkgs := append([]string{"htmls"}, strings.Split(m.Package, ".")...)
 	path := filepath.Join(pkgs...)
-	name := "services.html"
+	name := m.Name + ".html"
 	file, err := parser.CreateFile(path, name)
 	if err != nil {
 		return err
 	}
 	_, err = file.WriteString(out)
 	return err
+}
+
+func (m *Message) WriteHtmlWithService(services []*Service) error {
+	var navs []*Navigator
+	for _, s := range services {
+		navs = append(navs, NewNavigator(s, m))
+	}
+	return m.WriteHtmlWithNavigator(navs)
+}
+
+func (s *Service) WriteHtml() error {
+	for _, rpc := range s.RPCs {
+		rpc.WithLink("")
+	}
+	out, _ := mustache.RenderFile(serviceTemplate,
+		map[string]interface{}{
+			"Name": s.Name,
+			"Note": parser.PrettifyNote(s.Note),
+			"RPCs": s.RPCs,
+		},
+	)
+
+	pkgs := append([]string{"htmls"}, strings.Split(s.Package, ".")...)
+	path := filepath.Join(pkgs...)
+	name := s.Name + ".html"
+	file, err := parser.CreateFile(path, name)
+	if err != nil {
+		return err
+	}
+	_, err = file.WriteString(out)
+	return err
+}
+
+func (s *Service) Position() string {
+	pkgs := strings.Split(s.Package, ".")
+	path := filepath.Join(pkgs...)
+	name := s.Name + ".html"
+	return filepath.Join(path, name)
 }

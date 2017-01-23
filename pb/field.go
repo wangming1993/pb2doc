@@ -65,7 +65,6 @@ func (f *Field) WithLink(path string) {
 		return
 	}
 	pkg := f.formatDot(f.pkg)
-
 	ps := []string{path}
 	ts := strings.Split(f.Type, ".")
 	length := len(ts)
@@ -73,14 +72,13 @@ func (f *Field) WithLink(path string) {
 	if length > 1 {
 		if pkg != "" {
 			pkgs := strings.Split(pkg, ".")
-			for i:= 0; i<= len(pkgs); i++ {
+			for i := 0; i <= len(pkgs); i++ {
 				ps = append(ps, "..")
 			}
 		}
 		ps = append(ps, ts[0:length-1]...)
 	}
 	ps = append(ps, fileName)
-
 	f.Link = filepath.Join(ps...)
 	f.Type = f.formatDot(f.Type)
 }

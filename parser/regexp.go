@@ -51,37 +51,26 @@ func EndMultiComment(line string) bool {
 }
 
 func GetMessageName(line string) string {
-	c, _ := regexp.Compile("^\\s*message (.*)\\s{")
-	matches := c.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1]
-	}
-	return ""
+	return getName(line, "message")
 }
 
 func GetServiceName(line string) string {
-	c, _ := regexp.Compile("^\\s*service (.*)\\s{")
-	matches := c.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1]
-	}
-	return ""
+	return getName(line, "service")
 }
 
 func GetEnumName(line string) string {
-	c, _ := regexp.Compile("^\\s*enum\\s+(.*)\\s{")
-	matches := c.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1]
-	}
-	return ""
+	return getName(line, "enum")
 }
 
 func GetOneofName(line string) string {
-	c, _ := regexp.Compile("^\\s*oneof\\s+(.*)\\s{")
+	return getName(line, "oneof")
+}
+
+func getName(line, name string) string {
+	c, _ := regexp.Compile("^\\s*" + name + "\\s+(.*)\\s*{")
 	matches := c.FindStringSubmatch(line)
 	if len(matches) > 1 {
-		return matches[1]
+		return strings.Trim(matches[1], " ")
 	}
 	return ""
 }

@@ -3,7 +3,6 @@ package pb
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"regexp"
 
 	"github.com/wangming1993/pb2doc/parser"
@@ -11,6 +10,7 @@ import (
 
 type Proto struct {
 	Messages []*Message
+	Services []*Service
 	Comment  string
 	Package  string
 	content  []string
@@ -20,12 +20,12 @@ type Proto struct {
 	Path     string // base folder of proto file
 }
 
-func (p *Proto) Initialize(file string) error {
+func (p *Proto) Initialize(file string) []*Proto {
 	lines := parser.ReadFile(file)
 	p.content = lines
 	supported := p.IsSupported()
 	if !supported {
-		return errors.New("Unsupported proto syntax...")
+		panic(errors.New("Unsupported proto syntax..."))
 	}
 	p.Syntax = p.syntax()
 	p.Start += 1 //excludes syntax line
@@ -33,15 +33,18 @@ func (p *Proto) Initialize(file string) error {
 	p.initPackage()
 	p.initImports()
 
-	fmt.Println(p.Imports, file)
-
 	RegisterProto(p.Package, parser.FileName(file))
 
-	p.ResolveImports()
-	p.Parse()
+	var protos []*Proto
+	ps := p.ResolveImports()
+	if ps != nil {
+		protos = append(protos, ps...)
+	}
 
+	p.Parse()
+	protos = append(protos, p)
 	//fmt.Println(p.JSON())
-	return nil
+	return protos
 }
 
 func (p *Proto) syntax() string {
@@ -119,17 +122,19 @@ func (p *Proto) Parse() {
 				Package: p.Package,
 			}
 			skip := ParseMessage(p.content[i:], 1, message)
-			//log.Println(i, skip, i+skip, message.Name)
-			message.WriteHtml()
-			//message.Data()
+			//message.WriteHtml()
 			i += skip
+			p.Messages = append(p.Messages, message)
 		} else if parser.StartWithService(line) {
 			service := &Service{
-				Name:parser.GetServiceName(line),
+				Name:    parser.GetServiceName(line),
+				Note:    comment,
+				Package: p.Package,
 			}
 			skip := service.Parse(p.content[i:], 1)
 			i += skip
-			service.WriteHtml()
+			//service.WriteHtml()
+			p.Services = append(p.Services, service)
 		}
 	}
 }
@@ -142,21 +147,26 @@ func (p *Proto) JSON() (string, error) {
 	return string(buf), err
 }
 
-func (p *Proto) ResolveImports() {
+func (p *Proto) ResolveImports() []*Proto {
+	var protos []*Proto
 	for _, importFile := range p.Imports {
-		p.ResolveImport(importFile)
+		ps := p.ResolveImport(importFile)
+		if ps != nil {
+			protos = append(protos, ps...)
+		}
 	}
+	return protos
 }
 
-func (p *Proto) ResolveImport(importFile string) {
+func (p *Proto) ResolveImport(importFile string) []*Proto {
 	protoFile := GetAbsPath(p.Package, importFile)
 	if IsProtoParsed(p.Package, importFile) {
-		return
+		return nil
 	}
 	RegisterProto(p.Package, importFile)
 
 	newProto := &Proto{}
-	newProto.Initialize(protoFile)
+	return newProto.Initialize(protoFile)
 }
 
 func ParseMessage(lines []string, depth int, message *Message) int {
@@ -198,7 +208,7 @@ func ParseMessage(lines []string, depth int, message *Message) int {
 				message.Messages = append(message.Messages, embedMessage)
 			} else if parser.StartWithEnum(line) {
 				embedEnum := &Enum{
-					Name:    parser.GetEnumName(line),
+					Name: parser.GetEnumName(line),
 					Note: comment,
 				}
 				message.Enums = append(message.Enums, embedEnum)

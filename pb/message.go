@@ -67,3 +67,11 @@ func (m *Message) JSON() (string, error) {
 	}
 	return string(buf), err
 }
+
+func (m *Message) GetAll() []*Message {
+	var messages []*Message = []*Message{m}
+	for _, message := range m.Messages {
+		messages = append(messages, message.GetAll()...)
+	}
+	return messages
+}

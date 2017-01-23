@@ -6,9 +6,9 @@ import (
 
 type Service struct {
 	Package string
-	Name     string
-	RPCs     []*RPC
-	Comment  string
+	Name    string
+	RPCs    []*RPC
+	Note    string
 }
 
 func (s *Service) Parse(lines []string, depth int) int {
@@ -41,7 +41,6 @@ func (s *Service) Parse(lines []string, depth int) int {
 		if rpc != nil {
 			s.RPCs = append(s.RPCs, rpc)
 		}
-
 
 	}
 	return i
