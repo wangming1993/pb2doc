@@ -3,6 +3,8 @@ package main
 import (
 	"path/filepath"
 
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/pelletier/go-toml"
 	"github.com/wangming1993/pb2doc/parser"
@@ -24,8 +26,27 @@ func main() {
 
 	proto_file := config.GetDefault("proto_file", "member/service.proto")
 	protobuf := proto_file.(string)
-	proto := &pb.Proto{}
-	protos := proto.Initialize(filepath.Join(parser.GetBasePath(), protobuf))
+
+	fileName := filepath.Join(parser.GetBasePath(), protobuf)
+	var protos []*pb.Proto
+
+	if parser.IsDir(fileName) {
+		filepath.Walk(fileName, func(path string, info os.FileInfo, err error) error {
+			if parser.IsDir(path) {
+				return err
+			}
+			if !parser.IsProtoFile(path) {
+				return err
+			}
+			proto := &pb.Proto{}
+			ps := proto.Initialize(path)
+			protos = append(protos, ps...)
+			return err
+		})
+	} else {
+		proto := &pb.Proto{}
+		protos = proto.Initialize(fileName)
+	}
 
 	var messages []*pb.Message
 	var services []*pb.Service

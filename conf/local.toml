@@ -2,4 +2,4 @@ package_prefix = "mairpc"
 
 proto_base_path = "./protos/proto/"
 
-proto_file = "member/service.proto"
+proto_file = ""

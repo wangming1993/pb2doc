@@ -25,7 +25,7 @@ func (p *Proto) Initialize(file string) []*Proto {
 	p.content = lines
 	supported := p.IsSupported()
 	if !supported {
-		panic(errors.New("Unsupported proto syntax..."))
+		panic(errors.New("Unsupported proto syntax... file:" + file))
 	}
 	p.Syntax = p.syntax()
 	p.Start += 1 //excludes syntax line

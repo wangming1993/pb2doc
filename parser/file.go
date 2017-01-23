@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 )
 
 func ReadFile(filePath string) []string {
@@ -48,4 +49,13 @@ func CreateFile(path, name string) (*os.File, error) {
 
 func FileName(name string) string {
 	return path.Base(name)
+}
+
+func IsDir(fileName string) bool {
+	stats, err := os.Stat(fileName)
+	return err == nil && stats.IsDir()
+}
+
+func IsProtoFile(fileName string) bool {
+	return strings.HasSuffix(fileName, ".proto")
 }
