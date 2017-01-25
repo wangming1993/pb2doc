@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/cast"
+	"github.com/wangming1993/pb2doc/parser"
 )
 
 type Message struct {
@@ -74,4 +75,67 @@ func (m *Message) GetAll() []*Message {
 		messages = append(messages, message.GetAll()...)
 	}
 	return messages
+}
+
+func (message *Message) Parse(lines []string, depth int) int {
+	total := len(lines)
+	i := 0
+
+	for {
+
+		if i >= total {
+			break
+		}
+		line := lines[i]
+
+		if parser.EndWithBrace(line) {
+			//log.Println(line)
+			depth--
+			if depth == 0 {
+				return i
+			}
+		}
+
+		comment, fs := parser.ReadComment(lines[i:])
+		if fs > 0 {
+			i += fs
+			line = lines[i]
+		}
+		i++
+
+		if parser.IsExtendType(line) {
+			depth++
+			if parser.StartWithMessage(line) {
+				embedMessage := &Message{
+					Name:    parser.GetMessageName(line),
+					Comment: comment,
+					Package: message.Package,
+				}
+				i += embedMessage.Parse(lines[i:], 1)
+				message.Messages = append(message.Messages, embedMessage)
+			} else if parser.StartWithEnum(line) {
+				embedEnum := &Enum{
+					Name: parser.GetEnumName(line),
+					Note: comment,
+				}
+				message.Enums = append(message.Enums, embedEnum)
+			} else if parser.StartWithOneof(line) {
+				embedOneof := &Oneof{
+					Name:    parser.GetOneofName(line),
+					Comment: comment,
+				}
+				message.Oneofs = append(message.Oneofs, embedOneof)
+
+				step := ParseOneof(lines[i:], embedOneof)
+				i += step
+			}
+		} else {
+			field := NewFieldWithNote(message.Package, line, comment)
+			if field != nil {
+				message.Fields = append(message.Fields, field)
+			}
+		}
+
+	}
+	return i
 }

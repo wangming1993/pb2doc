@@ -43,6 +43,6 @@ message Property {
 // The greeting service definition.
 service Member {
   // Sends a greeting
-  rpc PersonList (Request) returns (Person) {}
-  rpc SendRequest (Request) returns (Person) {}
+  rpc PersonList(Request) returns (Person);
+  rpc SendRequest(Request) returns (Person);
 }

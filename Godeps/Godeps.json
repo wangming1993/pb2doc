@@ -9,6 +9,19 @@
 			"Rev": "800b0fc4a6cbf28a01d026ab54d6dec7050282fa"
 		},
 		{
+			"ImportPath": "github.com/cbroglie/mustache",
+			"Rev": "6857e4b493bdb8d4b1931446eb41704aeb4c28cb"
+		},
+		{
+			"ImportPath": "github.com/pelletier/go-buffruneio",
+			"Rev": "df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d"
+		},
+		{
+			"ImportPath": "github.com/pelletier/go-toml",
+			"Comment": "v0.4.0-5-ga1f048b",
+			"Rev": "a1f048ba24490f9b0674a67e1ce995d685cddf4a"
+		},
+		{
 			"ImportPath": "github.com/spf13/cast",
 			"Rev": "27b586b42e29bec072fe7379259cc719e1289da6"
 		},

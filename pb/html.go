@@ -104,7 +104,9 @@ func (s *Service) WriteHtml() error {
 }
 
 func (s *Service) Position() string {
-	pkgs := strings.Split(s.Package, ".")
+	pkg := strings.TrimPrefix(s.Package, parser.GetPKGPrefix())
+	pkg = strings.TrimPrefix(pkg, ".")
+	pkgs := strings.Split(pkg, ".")
 	path := filepath.Join(pkgs...)
 	name := s.Name + ".html"
 	return filepath.Join(path, name)

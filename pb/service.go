@@ -23,7 +23,6 @@ func (s *Service) Parse(lines []string, depth int) int {
 		line := lines[i]
 
 		if parser.EndWithBrace(line) {
-			//log.Println(line)
 			depth--
 			if depth == 0 {
 				return i
