@@ -43,11 +43,7 @@ func (m *Message) html() error {
 	return err
 }
 
-func (m *Message) WriteHtmlWithNavigator(navigators []*Navigator) error {
-	return m.htmlWithNavigator(navigators)
-}
-
-func (m *Message) htmlWithNavigator(navigators []*Navigator) error {
+func (m *Message) WriteHtmlWithNavigator(basePath string, navigators []*Navigator) error {
 	for _, f := range m.Fields {
 		f.WithLink("")
 	}
@@ -61,26 +57,22 @@ func (m *Message) htmlWithNavigator(navigators []*Navigator) error {
 		},
 	)
 
-	pkgs := append([]string{"htmls"}, strings.Split(m.Package, ".")...)
-	path := filepath.Join(pkgs...)
-	name := m.Name + ".html"
-	file, err := parser.CreateFile(path, name)
-	if err != nil {
-		return err
-	}
-	_, err = file.WriteString(out)
-	return err
+  err := writeHtmlFile(basePath, m.Package, m.Name, out)
+  if err != nil {
+    return err
+  }
+  return nil
 }
 
-func (m *Message) WriteHtmlWithService(services []*Service) error {
+func (m *Message) WriteHtmlWithService(basePath string, services []*Service) error {
 	var navs []*Navigator
 	for _, s := range services {
 		navs = append(navs, NewNavigator(s, m))
 	}
-	return m.WriteHtmlWithNavigator(navs)
+	return m.WriteHtmlWithNavigator(basePath, navs)
 }
 
-func (s *Service) WriteHtml() error {
+func (s *Service) WriteHtml(basePath string) error {
 	for _, rpc := range s.RPCs {
 		rpc.WithLink("")
 	}
@@ -92,15 +84,11 @@ func (s *Service) WriteHtml() error {
 		},
 	)
 
-	pkgs := append([]string{"htmls"}, strings.Split(s.Package, ".")...)
-	path := filepath.Join(pkgs...)
-	name := s.Name + ".html"
-	file, err := parser.CreateFile(path, name)
+	err := writeHtmlFile(basePath, s.Package, s.Name, out)
 	if err != nil {
 		return err
 	}
-	_, err = file.WriteString(out)
-	return err
+  return nil
 }
 
 func (s *Service) Position() string {
@@ -110,4 +98,16 @@ func (s *Service) Position() string {
 	path := filepath.Join(pkgs...)
 	name := s.Name + ".html"
 	return filepath.Join(path, name)
+}
+
+func writeHtmlFile(basePath, namespace, name, out string) error {
+  pkgs := append([]string{basePath}, strings.Split(namespace, ".")...)
+  path := filepath.Join(pkgs...)
+  fileName := name + ".html"
+  file, err := parser.CreateFile(path, fileName)
+  if err != nil {
+    return err
+  }
+  _, err = file.WriteString(out)
+  return err
 }

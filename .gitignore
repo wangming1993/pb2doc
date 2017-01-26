@@ -1,1 +1,2 @@
-internal/*.proto
+.DS_Store
+dist

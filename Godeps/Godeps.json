@@ -1,25 +1,16 @@
 {
 	"ImportPath": "github.com/wangming1993/pb2doc",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v74",
+	"GodepVersion": "v75",
 	"Deps": [
-		{
-			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.11.0-33-g800b0fc",
-			"Rev": "800b0fc4a6cbf28a01d026ab54d6dec7050282fa"
-		},
 		{
 			"ImportPath": "github.com/cbroglie/mustache",
 			"Rev": "6857e4b493bdb8d4b1931446eb41704aeb4c28cb"
 		},
 		{
-			"ImportPath": "github.com/pelletier/go-buffruneio",
-			"Rev": "df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d"
-		},
-		{
-			"ImportPath": "github.com/pelletier/go-toml",
-			"Comment": "v0.4.0-5-ga1f048b",
-			"Rev": "a1f048ba24490f9b0674a67e1ce995d685cddf4a"
+			"ImportPath": "github.com/docopt/docopt-go",
+			"Comment": "0.6.2",
+			"Rev": "784ddc588536785e7299f7272f39101f7faccc3f"
 		},
 		{
 			"ImportPath": "github.com/spf13/cast",
@@ -28,10 +19,6 @@
 		{
 			"ImportPath": "github.com/spf13/jwalterweatherman",
 			"Rev": "33c24e77fb80341fe7130ee7c594256ff08ccc46"
-		},
-		{
-			"ImportPath": "golang.org/x/sys/unix",
-			"Rev": "d75a52659825e75fff6158388dddc6a5b04f9ba5"
 		}
 	]
 }
