@@ -6,18 +6,10 @@ A tool used to parse Google protocol buffer message to JSON or html
 
 ## Install
 
-Add bin file directly
-
 ```
-go get github/wangming1993/pb2doc
+go get github.com/wangming1993/pb2doc
 ```
 
-Build by yourself
-
-```
-go build
-mv ./pb2doc /usr/local/bin
-```
 
 ## Usage
 
