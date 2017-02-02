@@ -11,6 +11,7 @@ import (
 type Proto struct {
 	Messages []*Message
 	Services []*Service
+	Enums    []*Enum
 	Comment  string
 	Package  string
 	content  []string
@@ -43,7 +44,6 @@ func (p *Proto) Initialize(file string) []*Proto {
 
 	p.Parse()
 	protos = append(protos, p)
-	//fmt.Println(p.JSON())
 	return protos
 }
 
@@ -121,9 +121,7 @@ func (p *Proto) Parse() {
 				Comment: comment,
 				Package: p.Package,
 			}
-			//skip := ParseMessage(p.content[i:], 1, message)
 			skip := message.Parse(p.content[i:], 1)
-			//message.WriteHtml()
 			i += skip
 			p.Messages = append(p.Messages, message)
 		} else if parser.StartWithService(line) {
@@ -136,6 +134,14 @@ func (p *Proto) Parse() {
 			i += skip
 			//service.WriteHtml()
 			p.Services = append(p.Services, service)
+		} else if parser.StartWithEnum(line) {
+			enum := &Enum{
+				Name: parser.GetEnumName(line),
+				Note: comment,
+				pkg:  p.Package,
+			}
+			enum.Parse(p.content[i:])
+			p.Enums = append(p.Enums, enum)
 		}
 	}
 }

@@ -118,6 +118,7 @@ func (message *Message) Parse(lines []string, depth int) int {
 					Name: parser.GetEnumName(line),
 					Note: comment,
 				}
+				embedEnum.Parse(lines)
 				message.Enums = append(message.Enums, embedEnum)
 			} else if parser.StartWithOneof(line) {
 				embedOneof := &Oneof{

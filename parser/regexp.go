@@ -99,6 +99,7 @@ func RemoveNoteSymbol(note string) string {
 }
 
 func PrettifyNote(note string) string {
+	note = RemoveNoteSymbol(note)
 	notes := strings.Split(note, "\n")
 	var comment string
 	for _, n := range notes {

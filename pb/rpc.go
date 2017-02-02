@@ -2,11 +2,11 @@ package pb
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/wangming1993/pb2doc/parser"
-	"path/filepath"
-	"strings"
 )
 
 type RPC struct {

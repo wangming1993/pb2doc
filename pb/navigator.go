@@ -10,12 +10,11 @@ type Navigator struct {
 	Name     string
 }
 
-func NewNavigator(service *Service, message *Message) *Navigator {
+func NewNavigator(service *Service, pkg string) *Navigator {
 	nav := &Navigator{
 		Name: service.Name,
 	}
 	position := service.Position()
-	pkg := message.Package
 
 	var ps []string
 
