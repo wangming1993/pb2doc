@@ -1,5 +1,0 @@
-package_prefix = "pb"
-
-proto_base_path = "./protos/"
-
-proto_file = ""

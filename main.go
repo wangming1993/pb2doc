@@ -1,66 +1,84 @@
 package main
 
 import (
+  "os"
 	"path/filepath"
 
-	"os"
-
-	"github.com/Sirupsen/logrus"
-	"github.com/pelletier/go-toml"
+  "github.com/docopt/docopt-go"
 	"github.com/wangming1993/pb2doc/parser"
 	"github.com/wangming1993/pb2doc/pb"
 )
 
 func main() {
-	conf := "conf/local.toml"
-	config, err := toml.LoadFile(conf)
-	if err != nil {
-		logrus.Fatalln(err)
-	}
+  var (
+    pkgPrefix string
+    protoPath string
+    distPath string
+    protoFilePattern string
+  )
+  usage := `
+  Usage:
+    pb2doc build <pkg> from <proto-dir> [--dist=<dir>]
+    pb2doc serve <pkg> from <proto-dir>
+    pb2doc -h | --help
+    pb2doc --version
 
-	package_prefix := config.GetDefault("package_prefix", "mairpc")
-	parser.SetPrefix(package_prefix.(string))
+  Options:
+    -h --help     Show this screen.
+    --version     Show version.
+    --dist=<dir>  HTML files containing folder [default: ./dist].`
+  args, _ := docopt.Parse(usage, nil, true, "1.0", false)
+  pkgPrefix = args["<pkg>"].(string)
+  protoPath = args["<proto-dir>"].(string)
+  distPath = args["--dist"].(string)
+  protoFilePattern = ""
 
-	proto_base_path := config.GetDefault("proto_base_path", "./protos/proto/")
-	parser.SetBasePath(proto_base_path.(string))
+  parser.SetPrefix(pkgPrefix)
+  parser.SetBasePath(protoPath)
+  //TODO: use glob pattern
+  fileName := filepath.Join(parser.GetBasePath(), protoFilePattern)
 
-	proto_file := config.GetDefault("proto_file", "member/service.proto")
-	protobuf := proto_file.(string)
+  var protos []*pb.Proto
 
-	fileName := filepath.Join(parser.GetBasePath(), protobuf)
-	var protos []*pb.Proto
+  if parser.IsDir(fileName) {
+    filepath.Walk(fileName, func(path string, info os.FileInfo, err error) error {
+      if parser.IsDir(path) {
+        return err
+      }
+      if !parser.IsProtoFile(path) {
+        return err
+      }
+      proto := &pb.Proto{}
+      ps := proto.Initialize(path)
+      protos = append(protos, ps...)
+      return err
+    })
+  } else {
+    proto := &pb.Proto{}
+    protos = proto.Initialize(fileName)
+  }
 
-	if parser.IsDir(fileName) {
-		filepath.Walk(fileName, func(path string, info os.FileInfo, err error) error {
-			if parser.IsDir(path) {
-				return err
-			}
-			if !parser.IsProtoFile(path) {
-				return err
-			}
-			proto := &pb.Proto{}
-			ps := proto.Initialize(path)
-			protos = append(protos, ps...)
-			return err
-		})
-	} else {
-		proto := &pb.Proto{}
-		protos = proto.Initialize(fileName)
-	}
+  // handle build logic
+  if args["build"] == true {
+    var messages []*pb.Message
+    var services []*pb.Service
+    for _, p := range protos {
+      for _, m := range p.Messages {
+        messages = append(messages, m.GetAll()...)
+      }
+      for _, s := range p.Services {
+        services = append(services, s)
+        s.WriteHtml(distPath)
+      }
+    }
 
-	var messages []*pb.Message
-	var services []*pb.Service
-	for _, p := range protos {
-		for _, m := range p.Messages {
-			messages = append(messages, m.GetAll()...)
-		}
-		for _, s := range p.Services {
-			services = append(services, s)
-			s.WriteHtml()
-		}
-	}
+    for _, m := range messages {
+      m.WriteHtmlWithService(distPath, services)
+    }
+  }
 
-	for _, m := range messages {
-		m.WriteHtmlWithService(services)
-	}
+  // handle serve logic
+  if args["serve"] == true {
+    // TODO: serve static html files to preview
+  }
 }
