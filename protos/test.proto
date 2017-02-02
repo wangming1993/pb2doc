@@ -28,6 +28,7 @@ message Person {
   PhoneType type = 4;
 
   repeated Property properties = 5;
+  map<string, Project> projects = 3;  //test map
 }
 
 // This is test for parse proto buffer <code>Enum</code>

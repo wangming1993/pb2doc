@@ -33,6 +33,11 @@ func StartWithOneof(line string) bool {
 	return startWith(line, "oneof")
 }
 
+func StartWithMap(line string) bool {
+	cp, _ := regexp.Compile("^\\s*map\\s*<")
+	return cp.MatchString(line)
+}
+
 func startWith(line, prefix string) bool {
 	cp, _ := regexp.Compile("^\\s*" + prefix + " ")
 	return cp.MatchString(line)

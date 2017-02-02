@@ -131,12 +131,16 @@ func (message *Message) Parse(lines []string, depth int) int {
 				i += step
 			}
 		} else {
-			field := NewFieldWithNote(message.Package, line, comment)
+			var field *Field
+			if parser.StartWithMap(line) {
+				field = NewMapField(message.Package, line, comment)
+			} else {
+				field = NewFieldWithNote(message.Package, line, comment)
+			}
 			if field != nil {
 				message.Fields = append(message.Fields, field)
 			}
 		}
-
 	}
 	return i
 }

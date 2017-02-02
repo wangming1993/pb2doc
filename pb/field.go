@@ -20,6 +20,27 @@ type Field struct {
 	pkg   string
 }
 
+func NewMapField(pkg, line, note string) *Field {
+	pattern := "^\\s*map\\s*<\\s*([a-zA-Z0-9_.-]+)\\s*,\\s*([a-zA-Z0-9_.-]+)\\s*>\\s*([a-z0-9_-]+)\\s?=\\s?([0-9]+)\\s*;\\s*((//.*)|(/\\*.*\\*/))?"
+	c, _ := regexp.Compile(pattern)
+	matches := c.FindStringSubmatch(line)
+	if len(matches) < 5 {
+		return nil
+	}
+	field := &Field{
+		Label: "optional",
+		Type:  "map",
+		Name:  matches[3],
+		Order: cast.ToInt(matches[4]),
+		pkg:   pkg,
+	}
+	if len(matches) > 5 {
+		field.Note = parser.PrettifyNote(matches[5])
+	}
+
+	return field
+}
+
 func NewField(pkg, line string) *Field {
 	pattern := "^\\s*([a-z]*)\\s+([a-zA-Z0-9.]+)\\s+([a-z0-9_-]+)\\s?=\\s?([0-9]+)\\s*;\\s*((//.*)|(/\\*.*\\*/))?"
 	c, _ := regexp.Compile(pattern)

@@ -14,6 +14,7 @@ const (
 	INT64  ScalarType = "int64"
 	BOOL   ScalarType = "bool"
 	STRING ScalarType = "string"
+	MAP    ScalarType = "map"
 )
 
 var scalarTypes map[string]ScalarType = map[string]ScalarType{
@@ -23,6 +24,7 @@ var scalarTypes map[string]ScalarType = map[string]ScalarType{
 	"int64":  INT64,
 	"bool":   BOOL,
 	"string": STRING,
+	"map":    MAP,
 }
 
 func IsScalarType(name string) bool {
