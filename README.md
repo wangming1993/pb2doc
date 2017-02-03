@@ -33,3 +33,8 @@ pb2doc build pb from ./protos --dist=html
 
 ![](doc/img/message_person.png)
 ![](doc/img/service_man.png)
+
+
+## Doc
+
+[develop guidance](doc/guidance.md)
