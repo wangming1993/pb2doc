@@ -81,7 +81,7 @@ func getName(line, name string) string {
 }
 
 func EndWithBrace(line string) bool {
-	c, _ := regexp.Compile("^\\s*}$")
+	c, _ := regexp.Compile("^\\s*}\\s*$")
 	return c.MatchString(line)
 }
 
@@ -93,13 +93,9 @@ func IsExtendType(line string) bool {
 }
 
 func RemoveNoteSymbol(note string) string {
-	note = strings.TrimPrefix(note, " ")
-	note = strings.TrimPrefix(note, "/**")
-	note = strings.TrimPrefix(note, "/*")
-	note = strings.TrimPrefix(note, "//")
-	note = strings.TrimPrefix(note, "**/")
-	note = strings.TrimPrefix(note, "*/")
-	note = strings.TrimPrefix(note, "*")
+	note = strings.Trim(note, " ")
+	note = strings.Trim(note, "/")
+	note = strings.Trim(note, "*")
 	return note
 }
 

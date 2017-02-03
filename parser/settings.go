@@ -1,5 +1,9 @@
 package parser
 
+import (
+	"strings"
+)
+
 var ProtoPath string
 var PackagePrefix string
 
@@ -17,4 +21,8 @@ func SetPrefix(prefix string) {
 
 func GetPKGPrefix() string {
 	return PackagePrefix
+}
+
+func TrimPKGPrefix(pkg string) string {
+	return strings.TrimPrefix(pkg, GetPKGPrefix()+".")
 }

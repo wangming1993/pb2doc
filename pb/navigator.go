@@ -3,6 +3,8 @@ package pb
 import (
 	"path/filepath"
 	"strings"
+
+	"github.com/wangming1993/pb2doc/parser"
 )
 
 type Navigator struct {
@@ -11,6 +13,7 @@ type Navigator struct {
 }
 
 func NewNavigator(service *Service, pkg string) *Navigator {
+	pkg = parser.TrimPKGPrefix(pkg)
 	nav := &Navigator{
 		Name: service.Name,
 	}
@@ -20,11 +23,9 @@ func NewNavigator(service *Service, pkg string) *Navigator {
 
 	pkgs := strings.Split(pkg, ".")
 	depth := len(pkgs)
-	if depth > 1 {
-		if pkg != "" {
-			for i := 0; i < depth; i++ {
-				ps = append(ps, "..")
-			}
+	if pkg != "" {
+		for i := 0; i < depth; i++ {
+			ps = append(ps, "..")
 		}
 	}
 	ps = append(ps, position)

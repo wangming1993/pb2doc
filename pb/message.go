@@ -1,7 +1,6 @@
 package pb
 
 import (
-	"encoding/json"
 	"log"
 
 	"github.com/spf13/cast"
@@ -60,15 +59,6 @@ func (m *Message) Data() {
 	log.Println("-----------------------------------------")
 }
 
-// JSON use json MarshalIndent to format
-func (m *Message) JSON() (string, error) {
-	buf, err := json.MarshalIndent(m, "", "\t")
-	if err != nil {
-		return "", err
-	}
-	return string(buf), err
-}
-
 func (m *Message) GetAll() []*Message {
 	var messages []*Message = []*Message{m}
 	for _, message := range m.Messages {
@@ -117,6 +107,7 @@ func (message *Message) Parse(lines []string, depth int) int {
 				embedEnum := &Enum{
 					Name: parser.GetEnumName(line),
 					Note: comment,
+					pkg:  message.Package,
 				}
 				embedEnum.Parse(lines)
 				message.Enums = append(message.Enums, embedEnum)
@@ -129,6 +120,7 @@ func (message *Message) Parse(lines []string, depth int) int {
 
 				step := ParseOneof(lines[i:], embedOneof)
 				i += step
+				message.Fields = append(message.Fields, embedOneof.Fields...)
 			}
 		} else {
 			var field *Field
