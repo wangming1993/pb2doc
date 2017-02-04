@@ -105,6 +105,5 @@ func (f *Field) WithLink(path string) {
 }
 
 func (f *Field) formatDot(withDot string) string {
-	fieldType := strings.TrimPrefix(withDot, parser.GetPKGPrefix())
-	return strings.TrimPrefix(fieldType, ".")
+	return parser.TrimPKGPrefix(withDot)
 }
