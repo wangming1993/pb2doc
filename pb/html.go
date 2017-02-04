@@ -28,7 +28,7 @@ func (m *Message) html() error {
 	out, _ := mustache.RenderFile(messageTemplate,
 		map[string]interface{}{
 			"Name":    m.Name,
-			"Comment": parser.PrettifyNote(m.Comment),
+			"Comment": parser.PrettifyNote(m.Note),
 			"Fields":  m.Fields,
 		},
 	)
@@ -52,7 +52,7 @@ func (m *Message) WriteHtmlWithNavigator(basePath string, navigators []*Navigato
 	out, _ := mustache.RenderFile(messageServiceTemplate,
 		map[string]interface{}{
 			"Name":       m.Name,
-			"Comment":    parser.PrettifyNote(m.Comment),
+			"Comment":    parser.PrettifyNote(m.Note),
 			"Fields":     m.Fields,
 			"Navigators": navigators,
 		},

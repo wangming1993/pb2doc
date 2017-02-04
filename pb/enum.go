@@ -69,7 +69,7 @@ func (e *Enum) Parse(lines []string) int {
 			return i
 		}
 
-		note, fs := parser.ReadComment(lines[i:])
+		note, fs := parser.ReadNote(lines[i:])
 		if fs > 0 {
 			i += fs
 			line = lines[i]

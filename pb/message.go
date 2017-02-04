@@ -8,7 +8,7 @@ import (
 )
 
 type Message struct {
-	Comment  string
+	Note     string
 	Package  string
 	Name     string
 	Messages []*Message
@@ -86,7 +86,7 @@ func (message *Message) Parse(lines []string, depth int) int {
 			}
 		}
 
-		comment, fs := parser.ReadComment(lines[i:])
+		note, fs := parser.ReadNote(lines[i:])
 		if fs > 0 {
 			i += fs
 			line = lines[i]
@@ -98,7 +98,7 @@ func (message *Message) Parse(lines []string, depth int) int {
 			if parser.StartWithMessage(line) {
 				embedMessage := &Message{
 					Name:    parser.GetMessageName(line),
-					Comment: comment,
+					Note:    note,
 					Package: message.Package,
 				}
 				i += embedMessage.Parse(lines[i:], 1)
@@ -106,15 +106,15 @@ func (message *Message) Parse(lines []string, depth int) int {
 			} else if parser.StartWithEnum(line) {
 				embedEnum := &Enum{
 					Name: parser.GetEnumName(line),
-					Note: comment,
+					Note: note,
 					pkg:  message.Package,
 				}
 				embedEnum.Parse(lines)
 				message.Enums = append(message.Enums, embedEnum)
 			} else if parser.StartWithOneof(line) {
 				embedOneof := &Oneof{
-					Name:    parser.GetOneofName(line),
-					Comment: comment,
+					Name: parser.GetOneofName(line),
+					Note: note,
 				}
 				message.Oneofs = append(message.Oneofs, embedOneof)
 
@@ -125,9 +125,9 @@ func (message *Message) Parse(lines []string, depth int) int {
 		} else {
 			var field *Field
 			if parser.StartWithMap(line) {
-				field = NewMapField(message.Package, line, comment)
+				field = NewMapField(message.Package, line, note)
 			} else {
-				field = NewFieldWithNote(message.Package, line, comment)
+				field = NewFieldWithNote(message.Package, line, note)
 			}
 			if field != nil {
 				message.Fields = append(message.Fields, field)

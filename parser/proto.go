@@ -1,6 +1,6 @@
 package parser
 
-func ReadComment(lines []string) (string, int) {
+func ReadNote(lines []string) (string, int) {
 	total := len(lines)
 	var (
 		i       int

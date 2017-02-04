@@ -106,7 +106,7 @@ func (p *Proto) Parse() {
 
 		line := p.content[i]
 
-		comment, step := parser.ReadComment(p.content[i:])
+		note, step := parser.ReadNote(p.content[i:])
 		if step > 0 {
 			i += step
 			line = p.content[i]
@@ -118,7 +118,7 @@ func (p *Proto) Parse() {
 			name := parser.GetMessageName(line)
 			message := &Message{
 				Name:    name,
-				Comment: comment,
+				Note:    note,
 				Package: p.Package,
 			}
 			skip := message.Parse(p.content[i:], 1)
@@ -127,7 +127,7 @@ func (p *Proto) Parse() {
 		} else if parser.StartWithService(line) {
 			service := &Service{
 				Name:    parser.GetServiceName(line),
-				Note:    comment,
+				Note:    note,
 				Package: p.Package,
 			}
 			skip := service.Parse(p.content[i:], 1)
@@ -137,7 +137,7 @@ func (p *Proto) Parse() {
 		} else if parser.StartWithEnum(line) {
 			enum := &Enum{
 				Name: parser.GetEnumName(line),
-				Note: comment,
+				Note: note,
 				pkg:  p.Package,
 			}
 			enum.Parse(p.content[i:])

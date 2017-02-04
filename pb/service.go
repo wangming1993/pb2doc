@@ -29,7 +29,7 @@ func (s *Service) Parse(lines []string, depth int) int {
 			}
 		}
 
-		comment, fs := parser.ReadComment(lines[i:])
+		comment, fs := parser.ReadNote(lines[i:])
 		if fs > 0 {
 			i += fs
 			line = lines[i]

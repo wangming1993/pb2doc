@@ -5,10 +5,10 @@ import (
 )
 
 type Oneof struct {
-	pkg     string
-	Name    string
-	Comment string
-	Fields  []*Field
+	pkg    string
+	Name   string
+	Note   string
+	Fields []*Field
 }
 
 func ParseOneof(lines []string, oneof *Oneof) int {
@@ -24,13 +24,13 @@ func ParseOneof(lines []string, oneof *Oneof) int {
 			return i
 		}
 
-		comment, fs := parser.ReadComment(lines[i:])
+		note, fs := parser.ReadNote(lines[i:])
 		if fs > 0 {
 			i += fs
 			line = lines[i]
 		}
 
-		field := NewFieldWithNote(oneof.pkg, line, comment)
+		field := NewFieldWithNote(oneof.pkg, line, note)
 		if field != nil {
 			oneof.Fields = append(oneof.Fields, field)
 		}
