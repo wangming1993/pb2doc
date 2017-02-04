@@ -16,10 +16,10 @@ func (s *Service) Parse(lines []string, depth int) int {
 	i := 0
 
 	for {
-
 		if i >= total {
 			break
 		}
+
 		line := lines[i]
 
 		if parser.EndWithBrace(line) {

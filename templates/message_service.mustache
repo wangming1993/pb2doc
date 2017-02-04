@@ -18,49 +18,62 @@
         <![endif]-->
 
         <style type="text/css">
-            .line {
-                width:auto;
-                height:2px;
-                margin-right: 12px;
-                background-color:#e8edf3;
-                overflow:hidden;
+          html {background-color: #fff; font-family: sans;}
+          body {background-color: #eee; border: 1px solid #ddd;
+                padding: 30px; margin: 30px;}
+          .emphasize{
+            color: #ae3732;
+            font-size: 16px;
+            font-weight: bold;
+          }
+          .cus-label {
+                display: inline;
+                padding: .2em .6em .3em;
+                font-size: 100%;
+                font-weight:bold;
+                line-height: 2;
+                color: #fff;
+                text-align: center;
+                white-space:normal;
+                vertical-align: baseline;
+                border-radius: .25em;
             }
-
         </style>
     </head>
-    <body style="background-color: #F9F9F9; margin-top: 50px;">
-
-        <div class="panel panel-default">
+    <body>
+        <div style="overflow: hidden;">
             <div class="col-md-10 col-md-offset-1">
-                <ul class="nav nav-pills" role="tablist">
-                    {{#Navigators}}
-                    <li role="presentation" class="active">
-                        <a href="{{{Position}}}">
-                            {{{Name}}}
-                        </a>
-                    </li>
-                    {{/Navigators}}
-                </ul>
-                <p class="lead text-info">Type:
-                    <code>
-                        <a href="https://developers.google.com/protocol-buffers/docs/proto3#simple">
+                <div style="margin: 30px;">
+                    <ul class="nav nav-pills" role="tablist">
+                        {{#Navigators}}
+                        <li role="presentation" class="active">
+                            <a href="{{{Position}}}">
+                                {{{Name}}}
+                            </a>
+                        </li>
+                        {{/Navigators}}
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-info">Type:
+                    <span class="label label-danger">
+                        <a href="https://developers.google.com/protocol-buffers/docs/proto3#simple" class="cus-label">
                             Message
                         </a>
-                    </code>
-                </p>
-                <p class="lead text-info" id="#{{{Name}}}">Name:
-                    <span class="label label-danger">{{{Name}}}</span>
-                </p>
+                    </span>
+                    </p>
+                    <p class="text-info" id="#{{{Name}}}">Name:
+                        <span class="label label-danger">{{{Name}}}</span>
+                    </p>
 
-                <div class="line"></div>
-                <p class="lead bg-primary text-danger"> Note: </p>
-                <blockquote>
-                     {{{Comment}}}
-                </blockquote>
+                    <p class="text-info"> Note: </p>
+                    <blockquote>
+                         {{{Comment}}}
+                    </blockquote>
 
-                <p class="lead bg-primary text-danger"> Fields: </p>
+                </div>
                 <table class="table table-striped table-bordered table-hover">
-                    <thead style="background-color: #37c3aa">
+                    <thead style="background-color: #37c3aa; color: #eee;">
                     <tr>
                         <th>Name</th>
                         <th>Type</th>
@@ -71,7 +84,7 @@
                       <tbody>
                         {{#Fields}}
                         <tr>
-                            <td>{{{Name}}}</td>
+                            <td class="emphasize">{{{Name}}}</td>
                             <td>
                                 <a href="{{{Link}}}">{{{Type}}}</a>
                             </td>
