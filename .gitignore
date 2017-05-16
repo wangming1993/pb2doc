@@ -2,3 +2,4 @@ html/**/*.html
 internal/**/*.proto
 .DS_Store
 dist
+proto

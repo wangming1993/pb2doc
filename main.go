@@ -82,6 +82,8 @@ func main() {
 		for _, e := range enums {
 			e.WriteHtmlWithService(distPath, services)
 		}
+
+		pb.GenerateIndexHTML(distPath, services)
 	}
 
 	// handle serve logic
