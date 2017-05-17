@@ -2,67 +2,30 @@ package pb
 
 import (
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/cbroglie/mustache"
 	"github.com/wangming1993/pb2doc/parser"
 )
 
-var messageTemplate string = "templates/message.mustache"
+var indexTemplate string = "templates/index.mustache"
 var serviceTemplate string = "templates/service.mustache"
 var messageServiceTemplate string = "templates/message_service.mustache"
 var enumServiceTemplate string = "templates/enum_service.mustache"
-
-func (m *Message) WriteHtml() error {
-	err := m.html()
-	for _, ms := range m.Messages {
-		err = ms.html()
-	}
-	return err
-}
-
-func (m *Message) html() error {
-	for _, f := range m.Fields {
-		f.WithLink("")
-	}
-	out, _ := mustache.RenderFile(messageTemplate,
-		map[string]interface{}{
-			"Name":   m.Name,
-			"Note":   parser.PrettifyNote(m.Note),
-			"Fields": m.Fields,
-		},
-	)
-
-	pkgs := append([]string{"htmls"}, strings.Split(m.Package, ".")...)
-	path := filepath.Join(pkgs...)
-	name := m.Name + ".html"
-	file, err := parser.CreateFile(path, name)
-	if err != nil {
-		return err
-	}
-	_, err = file.WriteString(out)
-	return err
-}
 
 func (m *Message) WriteHtmlWithNavigator(basePath string, navigators []*Navigator) error {
 	for _, f := range m.Fields {
 		f.WithLink("")
 	}
 
-	out, _ := mustache.RenderFile(messageServiceTemplate,
-		map[string]interface{}{
-			"Name":       m.Name,
-			"Note":       parser.PrettifyNote(m.Note),
-			"Fields":     m.Fields,
-			"Navigators": navigators,
-		},
-	)
-
-	err := writeHtmlFile(basePath, m.Package, m.Name, out)
-	if err != nil {
-		return err
-	}
-	return nil
+	path := getPath(basePath, m.Package)
+	return writeHTMLFile(path, m.Name, messageServiceTemplate, map[string]interface{}{
+		"Name":       m.Name,
+		"Note":       parser.PrettifyNote(m.Note),
+		"Fields":     m.Fields,
+		"Navigators": navigators,
+	})
 }
 
 func (m *Message) WriteHtmlWithService(basePath string, services []*Service) error {
@@ -77,19 +40,13 @@ func (s *Service) WriteHtml(basePath string) error {
 	for _, rpc := range s.RPCs {
 		rpc.WithLink("")
 	}
-	out, _ := mustache.RenderFile(serviceTemplate,
-		map[string]interface{}{
-			"Name": s.Name,
-			"Note": parser.PrettifyNote(s.Note),
-			"RPCs": s.RPCs,
-		},
-	)
 
-	err := writeHtmlFile(basePath, s.Package, s.Name, out)
-	if err != nil {
-		return err
-	}
-	return nil
+	path := getPath(basePath, s.Package)
+	return writeHTMLFile(path, s.Name, serviceTemplate, map[string]interface{}{
+		"Name": s.Name,
+		"Note": parser.PrettifyNote(s.Note),
+		"RPCs": s.RPCs,
+	})
 }
 
 func (s *Service) Position() string {
@@ -101,33 +58,14 @@ func (s *Service) Position() string {
 	return filepath.Join(path, name)
 }
 
-func writeHtmlFile(basePath, namespace, name, out string) error {
-	pkgs := append([]string{basePath}, strings.Split(namespace, ".")...)
-	path := filepath.Join(pkgs...)
-	fileName := name + ".html"
-	file, err := parser.CreateFile(path, fileName)
-	if err != nil {
-		return err
-	}
-	_, err = file.WriteString(out)
-	return err
-}
-
 func (e *Enum) WriteHtmlWithNavigator(basePath string, navigators []*Navigator) error {
-	out, _ := mustache.RenderFile(enumServiceTemplate,
-		map[string]interface{}{
-			"Name":       e.Name,
-			"Note":       parser.PrettifyNote(e.Note),
-			"Elems":      e.Elems,
-			"Navigators": navigators,
-		},
-	)
-
-	err := writeHtmlFile(basePath, e.pkg, e.Name, out)
-	if err != nil {
-		return err
-	}
-	return nil
+	path := getPath(basePath, e.pkg)
+	return writeHTMLFile(path, e.Name, enumServiceTemplate, map[string]interface{}{
+		"Name":       e.Name,
+		"Note":       parser.PrettifyNote(e.Note),
+		"Elems":      e.Elems,
+		"Navigators": navigators,
+	})
 }
 
 func (e *Enum) WriteHtmlWithService(basePath string, services []*Service) error {
@@ -136,4 +74,35 @@ func (e *Enum) WriteHtmlWithService(basePath string, services []*Service) error 
 		navs = append(navs, NewNavigator(s, e.pkg))
 	}
 	return e.WriteHtmlWithNavigator(basePath, navs)
+}
+
+func GenerateIndexHTML(basePath string, services []*Service) error {
+	pkgPrefix := parser.GetPKGPrefix()
+	path := strings.Join([]string{basePath, pkgPrefix}, "/")
+	var renderedServices []map[string]string
+	for _, service := range services {
+		renderedServices = append(renderedServices, map[string]string{
+			"Name":   service.Name,
+			"Folder": strings.Replace(service.Package, pkgPrefix+".", "", -1),
+			"Count":  strconv.Itoa(len(service.RPCs)),
+		})
+	}
+	return writeHTMLFile(path, "index", indexTemplate, map[string]interface{}{
+		"Services": renderedServices,
+	})
+}
+
+func writeHTMLFile(path, fileName, tmplName string, data map[string]interface{}) error {
+	file, err := parser.CreateFile(path, fileName+".html")
+	if err != nil {
+		return err
+	}
+	content, _ := mustache.RenderFile(tmplName, data)
+	_, err = file.WriteString(content)
+	return err
+}
+
+func getPath(basePath, namespace string) string {
+	pkgs := append([]string{basePath}, strings.Split(namespace, ".")...)
+	return filepath.Join(pkgs...)
 }
