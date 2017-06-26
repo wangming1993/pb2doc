@@ -2,7 +2,9 @@
 
 A tool used to parse Google protocol buffer message to JSON or html
 
---
+![build status](https://travis-ci.org/wangming1993/pb2doc.svg?branch=develop)
+
+---
 
 ## Install
 
